@@ -1,6 +1,6 @@
-# BasketWeaver
+# BasketWeaver [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) 
 
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+### [CHANGELOG](CHANGELOG.md)
 
 BasketWeaver is a Weaver/Injector for HBS's [BattleTech](https://harebrained-schemes.com/battletech/). It provides users the capability to inject C# code into BattleTech without requiring manual specification of [CIL](https://learn.microsoft.com/en-us/dotnet/standard/managed-code). 
 
@@ -61,7 +61,7 @@ Following along the `PerfLibHelper`, these steps provide a reference on replacin
 
 ### 1. Find method to replace:
 
-In this example, we optimize the `+` operand to optimize addition by removing `return new Color();` and reusing the `Color a` parameter as a result. As structures are passed by value, this results in no side effects in the calling method and simultaneously avoids construction overhead.
+In this example, we replace the `+` operator to optimize addition. First `return new Color();` is removed, and `Color a` reused as a variable to pass the result. As structures are passed by value, this results in no side effects in the calling method and simultaneously avoids construction overhead.
 
 From ILSpy inspection of `UnityEngine.CoreModule.dll`:
 ```csharp
@@ -83,9 +83,9 @@ See the PerfLibHelpers directory for examples on project setup. Otherwise, in ID
 
 ### 3. Wrap and modify the method
 
-The following snippet replaces of the `+` operator with an optimized method. Member variables called by methods must be replicated in order and include all preceding variables in the order they were defined. This can ease resolving references where field indexes are provided in CIL operands. The `BasketWeaver` namespace will be removed during injector and all method operands resolved against the BattleTech loaded `.DLL`. The wrapper namespace can be configured using the `HelperNamespace` option in the`BasketWeaverInjector.json` settings file.
+The following snippet replaces the `+` operator with an optimized method. Member variables called by replaced methods shall include all preceding variables in the order they were defined. This may ease resolving references where field indexes are provided in CIL operands. The `BasketWeaver` namespace will be removed during injector and method operands resolved against the BattleTech loaded `.DLL`. The wrapper namespace can be configured using the `HelperNamespace` option in the`BasketWeaverInjector.json` settings file.
 
-**NOTE:** `.NET` may ambiguously resolve the namespaces against the helper namespace. In these instances, manually inserting the references may be required. Types are generally resolved by full-name in the injector. 
+**NOTE:** `.NET` can ambiguously resolve the namespaces against the helper namespace. In these instances, manually inserting the references may be required. Types are generally resolved by full-name in the injector. 
 
 `Color.cs` snippet from PerfLibHelpers:
 ```csharp
