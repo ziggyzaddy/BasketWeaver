@@ -83,7 +83,7 @@ See the PerfLibHelpers directory for examples on project setup. Otherwise, in ID
 
 ### 3. Wrap and modify the method
 
-The following snippet replaces of the `+` operand with an optimized method. Member variables called by methods must be replicated in order and include all preceding variables in the order they were defined. This can ease resolving references where field indexes are provided in CIL operands. The `BasketWeaver` namespace will be removed during injector and all method operands resolved against the BattleTech loaded `.DLL`. The wrapper namespace can be configured using the `HelperNamespace` option in the`BasketWeaverInjector.json` settings file.
+The following snippet replaces of the `+` operator with an optimized method. Member variables called by methods must be replicated in order and include all preceding variables in the order they were defined. This can ease resolving references where field indexes are provided in CIL operands. The `BasketWeaver` namespace will be removed during injector and all method operands resolved against the BattleTech loaded `.DLL`. The wrapper namespace can be configured using the `HelperNamespace` option in the`BasketWeaverInjector.json` settings file.
 
 **NOTE:** `.NET` may ambiguously resolve the namespaces against the helper namespace. In these instances, manually inserting the references may be required. Types are generally resolved by full-name in the injector. 
 

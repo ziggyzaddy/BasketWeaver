@@ -11,8 +11,6 @@ namespace Harmony
         StaticConstructor,
     }
 }
-
-
 // Backwards compatibility
 namespace HarmonyLib
 {

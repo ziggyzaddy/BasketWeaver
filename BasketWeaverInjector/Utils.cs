@@ -10,17 +10,6 @@ using Mono.Cecil;
 namespace BasketWeaverInjector
 {
 
-    // Avoids dependency on 0Harmony.dll
-
-    public enum HarmonyLibMethodType
-    {
-        Normal,
-        Getter,
-        Setter,
-        Constructor,
-        StaticConstructor,
-        Enumerator,
-    }
     public class Utils
     {
         // Remove the Wrapper Namespace when injecting

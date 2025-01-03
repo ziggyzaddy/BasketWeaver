@@ -349,9 +349,6 @@ namespace BasketWeaverInjector
             tgtMethod.Body.Optimize();
         }
 
-        // Automated inlining through basic heuristics.
   
-
-
     }
 }

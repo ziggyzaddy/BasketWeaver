@@ -64,8 +64,6 @@ namespace BasketWeaverInjector
             return new ModConfig();
         }
 
-
-
         // Routine called by the injector.
         public void Inject(IAssemblyResolver resolver)
         {
@@ -97,8 +95,6 @@ namespace BasketWeaverInjector
                 helperSW.Stop();
                 Console.WriteLine($"Helper Injection Took {helperSW.Elapsed.TotalMilliseconds} ms");
             }
-
-            Definitions.Close();
         }
 
         // Run the helper injection and iterate all types in the configured namespace and match them to their ingame equivalents
@@ -181,15 +177,20 @@ namespace BasketWeaverInjector
             ConflictDetect conflict
         )
         {
-            foreach (var inline in definitions.Definitions)
+            foreach (var toInline in config.AutoInline)
             {
-                Console.WriteLine(inline);
-                AutoInline.Run(
-                    conflict,
-                    inline.Value,
-                    16
-                );
+                if(definitions.GetModuleByName(toInline, out var assembly))
+                {
+                    Console.WriteLine("Got Module\n");
+                    AutoInline.Run(
+                        conflict,
+                        assembly,
+                        16
+                    );
+                }
+
             }
+
         }
     }
 }
