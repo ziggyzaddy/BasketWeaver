@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectGuid>{24B640F1-9AFC-44C6-8414-6F28F3097D5B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>13</LangVersion>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <AssemblySearchPaths>
+      $(BattleTechGameDir)\Mods\ModTek\;
+      $(BattleTechGameDir)\BattleTech_Data\Managed\;
+    </AssemblySearchPaths>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <SignAssembly>True</SignAssembly>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+  <Target Name="CopyFilesToGame" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BattleTechGameDir)\Mods\ModTek\Injectors" />
+    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(BattleTechGameDir)\Mods\ModTek\Injectors" />
+  </Target>
+
+    <Target Name="CopyFilesToMod" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Injectors" />
+    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Injectors" />
+  </Target>
+  <Target Name="CopyFilesToBuild" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\Mods\ModTek\Injectors" />
+    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\ModTek\Injectors" />
+  </Target>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

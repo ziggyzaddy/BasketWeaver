@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>True</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <Target Name="CopyFilesToGame" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BattleTechGameDir)\Mods\BasketWeaver\Helpers\" />
+  </Target>
+  <Target Name="CopyFilesToBuild" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Helpers\" />
+  </Target>
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+</Project>

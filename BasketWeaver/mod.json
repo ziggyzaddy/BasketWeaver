@@ -1,0 +1,13 @@
+{
+  "Name": "BasketWeaver",
+  "Enabled": true,
+  "Version": "0.0.0",
+  "Description": "Container Mod for Weaving C# into BattleTech through Mono.Cecil",
+  "Author": "ziggy",
+  "Website": "www.github.com/ziggyzaddy/BasketWeaver",
+  "Contact": "ziggyzaddy@protonmail.com",
+  "DLL": "BasketWeaver.dll",
+  "DLLEntryPoint": "BasketWeaver.Main.Init",
+  "Settings": {
+  }
+}

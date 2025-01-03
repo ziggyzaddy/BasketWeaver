@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketWeaver", "BasketWeaver\BasketWeaver.csproj", "{99013E13-B20F-4AB8-8AE5-8FC2ED843750}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketWeaverInjector", "BasketWeaverInjector\BasketWeaverInjector.csproj", "{24B640F1-9AFC-44C6-8414-6F28F3097D5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfLibHelpers", "PerfLibHelpers\PerfLibHelpers.csproj", "{9C6E7670-428E-4DA9-B194-6A5BB426E42A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketWeaverRunner", "BasketWeaverRunner\BasketWeaverRunner.csproj", "{EE120E29-BB0D-4EEB-AE17-52D12986D6B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99013E13-B20F-4AB8-8AE5-8FC2ED843750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99013E13-B20F-4AB8-8AE5-8FC2ED843750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99013E13-B20F-4AB8-8AE5-8FC2ED843750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99013E13-B20F-4AB8-8AE5-8FC2ED843750}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24B640F1-9AFC-44C6-8414-6F28F3097D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24B640F1-9AFC-44C6-8414-6F28F3097D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24B640F1-9AFC-44C6-8414-6F28F3097D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24B640F1-9AFC-44C6-8414-6F28F3097D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C6E7670-428E-4DA9-B194-6A5BB426E42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C6E7670-428E-4DA9-B194-6A5BB426E42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C6E7670-428E-4DA9-B194-6A5BB426E42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C6E7670-428E-4DA9-B194-6A5BB426E42A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE120E29-BB0D-4EEB-AE17-52D12986D6B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE120E29-BB0D-4EEB-AE17-52D12986D6B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE120E29-BB0D-4EEB-AE17-52D12986D6B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE120E29-BB0D-4EEB-AE17-52D12986D6B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
