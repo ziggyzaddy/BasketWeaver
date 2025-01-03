@@ -80,10 +80,10 @@ namespace BasketWeaverInjector
 
         // The heart of the injector, takes a target type from a source assembly and injects it into a target.
         public static void Run(
-            AssemblyDefinition srcAssembly, 
-            AssemblyDefinition tgtAssembly, 
-            string srcNamespace, 
-            string tgtTypeStr, 
+            AssemblyDefinition srcAssembly,
+            AssemblyDefinition tgtAssembly,
+            string srcNamespace,
+            string tgtTypeStr,
             bool printIL = false,
             bool printILDiff = false)
         {
@@ -112,6 +112,46 @@ namespace BasketWeaverInjector
                     string tgtSig = Utils.ExtractSig(tgtMethod);
                     tgtMethods.Add(tgtSig, tgtMethod);
                 }
+
+                foreach (var srcMethodData in srcMethods)
+                {
+                    
+                    var srcMethod = srcMethodData.Value;
+
+                    if (!tgtMethods.TryGetValue(srcMethodData.Key, out MethodDefinition tgtMethod))
+                    {
+                        Console.WriteLine("\n### NEW METHOD:");
+
+                        var newMethod = new MethodDefinition(srcMethod.Name, srcMethod.Attributes, srcMethod.ReturnType);
+                        tgtType.Methods.Add(newMethod);
+                        var editMethod = tgtType.Methods.Last();
+                        editMethod.DeclaringType = tgtType;
+                        editMethod.Body.Variables.Clear();
+                        editMethod.IsAbstract = srcMethod.IsAbstract;
+                        editMethod.IsStatic = srcMethod.IsStatic;
+                        editMethod.IsUnmanagedExport = srcMethod.IsUnmanagedExport;
+                        foreach (var variable in srcMethod.Body.Variables)
+                        {
+                            var newVariable = new VariableDefinition(tgtType.Module.ImportReference(variable.VariableType));
+                            editMethod.Body.Variables.Add(newVariable);
+                        }
+                        
+                        foreach (var param in srcMethod.Parameters)
+                        {
+                            editMethod.Parameters.Add(param);
+                        }
+                            
+                        editMethod.Body.MaxStackSize = srcMethod.Body.MaxStackSize;
+                        editMethod.Body = new MethodBody(srcMethod);
+                        var proc = editMethod.Body.GetILProcessor();
+                        
+                        string tgtSig = Utils.ExtractSig(editMethod);
+                        tgtMethods.Add(tgtSig, editMethod);
+                        Formatter.PrintMethod(editMethod);
+
+                    }
+                }
+
 
                 foreach (var srcMethodData in srcMethods)
                 {
@@ -146,11 +186,6 @@ namespace BasketWeaverInjector
                             Console.WriteLine("\n### IL REPLACED:");
                             Formatter.PrintMethod(tgtMethod);
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine("\n### NEW METHOD:");
-                        Console.WriteLine($"{srcMethod.FullName}");
                     }
                 }
             }
@@ -349,6 +384,6 @@ namespace BasketWeaverInjector
             tgtMethod.Body.Optimize();
         }
 
-  
+
     }
 }

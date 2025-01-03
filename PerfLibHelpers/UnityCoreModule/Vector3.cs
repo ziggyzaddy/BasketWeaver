@@ -11,6 +11,16 @@ namespace BasketWeaver
         // Token: 0x02000141 RID: 321
         public struct Vector3 : IEquatable<Vector3>
         {
+
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void AssignTest(float x, float y, float z)
+            {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+
             // Token: 0x06000CA1 RID: 3233
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector3(float x, float y, float z)
