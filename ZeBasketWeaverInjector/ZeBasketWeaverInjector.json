@@ -1,9 +1,12 @@
 {
-  "HelperNamespace": "BasketWeaver",
+  "HelperNamespace": "Inject",
   "PrintReplacedIL": false,
   "PrintDiffIL": false,
   "RunHelpers": true,
   "RunAutoInline": true,
+  "AutoInlineSafeMode": true,
+  "HackBool": true,
+
 
   "InjectableDefinitions": [
     "Assembly-CSharp",

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     // Inspired by ILspy, dnspy, and DotPeek
     public class Formatter

@@ -1,4 +1,4 @@
-﻿using BasketWeaverInjector;
+﻿
 using Mono.Cecil;
 using Newtonsoft.Json;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     // Contains the Injector runtime and initialization logic
     public class I_BasketWeaver : IInjector
@@ -21,18 +21,18 @@ namespace BasketWeaverInjector
         private string InjectorPath = "/Mods/ModTek/Injectors";
 
         // Must be local to the injector
-        private string SettingsFile = "BasketWeaverInjector.json";
+        private string SettingsFile = "ZeBasketWeaverInjector.json";
 
 
         ConflictDetect Conflicts;
         InjectableDefinitions Definitions;
 
         // Finds the configuration setting for the injectors. Otherwise, use defaults
-        public ModConfig GetModConfig()
+        public Settings GetModConfig()
         {
             string curDir = Directory.GetCurrentDirectory();
             string searchPath = Path.Combine(curDir + InjectorPath);
-            ModConfig config = new ModConfig();
+            Settings config = new Settings();
 
             bool foundSettings = false;
             if (Directory.Exists(searchPath))
@@ -44,7 +44,7 @@ namespace BasketWeaverInjector
                     try
                     {
                         string jsonText = File.ReadAllText(settingsLocation);
-                        config = JsonConvert.DeserializeObject<ModConfig>(jsonText);
+                        config = JsonConvert.DeserializeObject<Settings>(jsonText);
                         foundSettings = true;
                     }
                     catch (Exception e)
@@ -61,7 +61,7 @@ namespace BasketWeaverInjector
                 return config;
             }
             Console.WriteLine($"Settings not found, using defaults");
-            return new ModConfig();
+            return new Settings();
         }
 
         // Routine called by the injector.
@@ -72,6 +72,7 @@ namespace BasketWeaverInjector
             
             Definitions = new InjectableDefinitions(resolver, config);
             Conflicts = new ConflictDetect();
+            Conflicts.CheckDefinition(Definitions);
 
             System.Diagnostics.Stopwatch helperSW = new System.Diagnostics.Stopwatch();
             System.Diagnostics.Stopwatch inlinerSW = new System.Diagnostics.Stopwatch();
@@ -99,7 +100,7 @@ namespace BasketWeaverInjector
 
         // Run the helper injection and iterate all types in the configured namespace and match them to their ingame equivalents
         private void RunHelperInjection(
-            ModConfig config,
+            Settings config,
             InjectableDefinitions definitions
         )
         {
@@ -142,6 +143,9 @@ namespace BasketWeaverInjector
                             )
                         )
                     );
+                    
+
+
                     foreach (var type in helpers.Last().MainModule.Types)
                     {
                         Definitions.
@@ -164,6 +168,30 @@ namespace BasketWeaverInjector
                             }
                         }
                     }
+                    
+                    //// Type Prepass, add new types and retarget Namespace
+                    //foreach (var type in helpers.Last().MainModule.Types)
+                    //{
+                    //    Definitions.
+                    //    FindType(
+                    //        type.FullName.Replace(config.HelperNamespace + ".", ""),
+                    //        out var typeDefinition
+                    //    );
+                    //    if (typeDefinition == null)
+                    //    {
+                    //        try
+                    //        {
+                    //            Console.WriteLine($"### New Type: {type.FullName}");
+                    //            var st_Hello_0 = new TypeDefinition("", "Hello", TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.SequentialLayout | TypeAttributes.Public, helpers.Last().MainModule.ImportReference(typeof(System.ValueType)));
+                    //            helpers.Last().MainModule.Types.Add(st_Hello_0);
+                    //        }
+                    //        catch (Exception e)
+                    //        {
+                    //            Console.WriteLine(e);
+                    //        }
+                    //    }
+                    //}
+
                 }
             }
         }
@@ -172,7 +200,7 @@ namespace BasketWeaverInjector
 
         // Run the autoinliner to add the AggressiveInlining attribute to certain functions
         private static void RunAutoInline(
-            ModConfig config,
+            Settings config,
             InjectableDefinitions definitions,
             ConflictDetect conflict
         )
@@ -181,8 +209,8 @@ namespace BasketWeaverInjector
             {
                 if(definitions.GetModuleByName(toInline, out var assembly))
                 {
-                    Console.WriteLine("Got Module\n");
                     AutoInline.Run(
+                        config,
                         conflict,
                         assembly,
                         16

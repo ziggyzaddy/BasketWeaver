@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketWeaver", "BasketWeaver\BasketWeaver.csproj", "{99013E13-B20F-4AB8-8AE5-8FC2ED843750}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketWeaverInjector", "BasketWeaverInjector\BasketWeaverInjector.csproj", "{24B640F1-9AFC-44C6-8414-6F28F3097D5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeBasketWeaverInjector", "ZeBasketWeaverInjector\ZeBasketWeaverInjector.csproj", "{24B640F1-9AFC-44C6-8414-6F28F3097D5B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfLibHelpers", "PerfLibHelpers\PerfLibHelpers.csproj", "{9C6E7670-428E-4DA9-B194-6A5BB426E42A}"
 EndProject

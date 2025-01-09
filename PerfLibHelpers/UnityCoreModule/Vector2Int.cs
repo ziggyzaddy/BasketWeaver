@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 
-namespace BasketWeaver
+namespace Inject
 {
     namespace UnityEngine
     {

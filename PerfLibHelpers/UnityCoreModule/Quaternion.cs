@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Internal;
 
-namespace BasketWeaver
+namespace Inject
 {
     namespace UnityEngine
     {

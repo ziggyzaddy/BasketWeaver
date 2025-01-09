@@ -7,7 +7,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <AssemblySearchPaths>
-      $(BattleTechGameDir)\Mods\ModTek\;
+      $(BattleTechGameDir)\Mods\ModTek\lib\;
       $(BattleTechGameDir)\BattleTech_Data\Managed\;
     </AssemblySearchPaths>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -19,16 +19,16 @@
   </PropertyGroup>
   <Target Name="CopyFilesToGame" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(BattleTechGameDir)\Mods\ModTek\Injectors" />
-    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(BattleTechGameDir)\Mods\ModTek\Injectors" />
+    <Copy SourceFiles="ZeBasketWeaverInjector.json" DestinationFolder="$(BattleTechGameDir)\Mods\ModTek\Injectors" />
   </Target>
 
     <Target Name="CopyFilesToMod" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(BattleTechGameDir)' != ''">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Injectors" />
-    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Injectors" />
+    <Copy SourceFiles="ZeBasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\BasketWeaver\Injectors" />
   </Target>
   <Target Name="CopyFilesToBuild" AfterTargets="CopyFilesToOutputDirectory">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\Mods\ModTek\Injectors" />
-    <Copy SourceFiles="BasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\ModTek\Injectors" />
+    <Copy SourceFiles="ZeBasketWeaverInjector.json" DestinationFolder="$(SolutionDir)\Build\Mods\ModTek\Injectors" />
   </Target>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

@@ -1,7 +1,7 @@
 ﻿using Mono.Cecil;
 using System.Collections.Generic;
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     public static class Injector
     {

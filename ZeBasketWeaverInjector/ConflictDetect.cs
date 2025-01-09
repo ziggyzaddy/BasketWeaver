@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Mono.Cecil.Rocks;
 
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     public struct ConflictData
     {
@@ -30,9 +30,16 @@ namespace BasketWeaverInjector
 
     public class ConflictDetect
     {
-        Dictionary<string, ConflictData> ConflictDict = new Dictionary<string, ConflictData>();
+        // Uses ExtractSig
+        Dictionary<string, ConflictData> methodConflicts = new Dictionary<string, ConflictData>();
+        // FullName?
+        Dictionary<string, ConflictData> typeConflicts = new Dictionary<string, ConflictData>();
 
         DefaultAssemblyResolver modResolver = new DefaultAssemblyResolver();
+
+
+
+
 
         List<string> AvoidDetect = new List<string>
         {
@@ -42,9 +49,25 @@ namespace BasketWeaverInjector
             "winhttp",
             "UnityEngine",
             "mono",
-            "sqlite"
+            "sqlite",
+            "SimdJsonNative"
 
         };
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TypeDefConflictCheck(TypeDefinition typeDef)
+        {
+
+            if (typeConflicts.TryGetValue(typeDef.FullName, out var conflict))
+            {
+                Console.WriteLine($"     [SKIP - TYPE] {typeDef.FullName}");
+                return true;
+            }
+            return false;
+
+
+        }
 
 
         // Returns true if MethodDefinition conflicts
@@ -53,7 +76,7 @@ namespace BasketWeaverInjector
         {
             string conflictCheck = methodDef.DeclaringType.FullName + "::" + methodDef.Name;
 
-            if (ConflictDict.TryGetValue(conflictCheck, out var conflict))
+            if (methodConflicts.TryGetValue(conflictCheck, out var conflict))
             {
                 Console.WriteLine($"     [SKIP - DEF] {methodDef.DeclaringType.FullName}::{methodDef.Name}");
                 return true;
@@ -68,7 +91,7 @@ namespace BasketWeaverInjector
         {
             string conflictCheck = methodRef.DeclaringType.FullName + "::" + methodRef.Name;
 
-            if (ConflictDict.TryGetValue(conflictCheck, out var conflict))
+            if (methodConflicts.TryGetValue(conflictCheck, out var conflict))
             {
                 Console.WriteLine($"     [SKIP - REF] {methodRef.DeclaringType.FullName}::{methodRef.Name}");
                 return true;
@@ -198,7 +221,7 @@ namespace BasketWeaverInjector
             }
 
         }
-        
+
         public string GetHarmonyLibMethodTypeString(HarmonyLib.MethodType methodType, string methodStr = "")
         {
             switch (methodType)
@@ -235,6 +258,129 @@ namespace BasketWeaverInjector
         }
 
 
+
+        public void CheckDefinition(InjectableDefinitions definitions)
+        {
+
+            foreach (var injectableDef in definitions.Definitions)
+            {
+                Console.WriteLine($"Diffing {injectableDef.Value.FullName}");
+
+                Dictionary<string, MethodDefinition> injectableMethods = new Dictionary<string, MethodDefinition>();
+                Dictionary<string, MethodDefinition> referenceMethods = new Dictionary<string, MethodDefinition>();
+
+                Mono.Cecil.AssemblyDefinition referenceDef = null;
+                try
+                {
+                    referenceDef = modResolver.Resolve(new Mono.Cecil.AssemblyNameReference(injectableDef.Key.Replace(".dll", ""), null));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                if (referenceDef == null)
+                {
+                    continue;
+                }
+                if (injectableDef.Value == null)
+                {
+                    continue;
+                }
+
+                Console.WriteLine($"Found {referenceDef.FullName}");
+
+                int injectableMethodCount = 0;
+                int referenceMethodCount = 0;
+
+                foreach (var type in injectableDef.Value.MainModule.Types)
+                {
+                    foreach (var method in type.Methods)
+                    {
+                        injectableMethods[method.FullName] = method;
+                        injectableMethodCount = injectableMethodCount + 1;
+                    }
+
+
+                }
+                foreach (var type in referenceDef.MainModule.Types)
+                {
+                    foreach (var method in type.Methods)
+                    {
+                        referenceMethods[method.FullName] = method;
+                        referenceMethodCount = referenceMethodCount + 1;
+                    }
+                }
+
+                Console.WriteLine($"Counts: Injectable: {injectableMethodCount} | Reference: {referenceMethodCount}");
+
+                foreach (var method in injectableMethods)
+                {
+                    if (referenceMethods.TryGetValue(method.Value.FullName, out MethodDefinition refMethod))
+                    {
+
+                        //refMethod.FullName = method.Key;    
+                        if (method.Value.HasBody != refMethod.HasBody)
+                        {
+                            Console.WriteLine($"Detected Diff Method [BODY]: {method.Value.FullName}");
+                            continue;
+                        }
+
+                        if (method.Value.HasBody == true)
+                        {
+
+                            if ((method.Value.Body.Instructions != null) && (refMethod.Body.Instructions != null))
+                            {
+
+                                if (method.Value.Body.Instructions.Count() != refMethod.Body.Instructions.Count())
+                                {
+
+                                    Console.WriteLine($"Detected Diff Method [INSTR_CNT]: {method.Value.FullName}");
+
+                                    Console.WriteLine($"### Original Method:");
+                                    Formatter.PrintMethod(refMethod);
+                                    Console.WriteLine($"### New Method:");
+                                    Formatter.PrintMethod(method.Value);
+                                }
+                            }
+                        }
+
+                        //if(method.Value.Body.Instructions.Count != refMethod.Body.Instructions.Count)
+                        //{                        
+                        //    Console.WriteLine($"Detected Diff Method [INSTR_CNT]: {method.Value.FullName}");
+                        //    continue;
+                        //}
+
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Detected Injected Method: {method.Value.FullName}");
+
+                    }
+                }
+
+
+                // Required to not hold the reference to Assembly and cause later loader errors
+                referenceDef.Dispose();
+            }
+
+        }
+
+        bool MethodEquality(MethodDefinition methodA, MethodDefinition methodB)
+        {
+            if (methodA.FullName != methodB.FullName) { return false; }
+
+            if (methodA.HasBody != methodB.HasBody) { return false; }
+
+            if (methodB.CallingConvention != methodA.CallingConvention) { return false; }
+            if (methodA.DeclaringType.FullName != methodB.DeclaringType.FullName) { return false; }
+
+
+            return true;
+
+        }
+
+
         public ConflictDetect()
         {
             string curDir = Directory.GetCurrentDirectory();
@@ -247,10 +393,13 @@ namespace BasketWeaverInjector
             Console.WriteLine($"Found Mod Dir: {modDir}");
             string[] modDlls = Directory.GetFiles(modDir, "*.dll", SearchOption.AllDirectories);
             modResolver.AddSearchDirectory(Path.Combine(curDir, "/BattleTech_Data/Managed"));
+
             Console.WriteLine($"Running Conflict Detection for Harmony");
 
             foreach (var modDll in modDlls)
             {
+                if (modDll.Contains("AssembliesInjected")) { continue; }
+                if (modDll.Contains("AssembliesShimmed")) { continue; }
                 Console.WriteLine($"Adding Path {Path.GetDirectoryName(modDll)}");
                 modResolver.AddSearchDirectory(Path.GetDirectoryName(modDll));
             }
@@ -269,7 +418,11 @@ namespace BasketWeaverInjector
                 }
                 if (avoidDLL) { continue; }
 
-                if(modDll.Contains("Managed"))
+                if (modDll.Contains("Managed"))
+                {
+                    continue;
+                }
+                if (modDll.Contains("Simd"))
                 {
                     continue;
                 }
@@ -286,18 +439,20 @@ namespace BasketWeaverInjector
                     if (type == null) { continue; }
                     if (!type.HasCustomAttributes) { continue; }
 
-                    //// Very simple state machine
-                    //bool gotType = false;
-                    //bool gotMethod = false;
-
                     var typeStr = "";
                     var methodStr = "";
-
+                    bool isHarmony = false;
 
                     foreach (var custAttr in type.CustomAttributes)
                     {
-
-                        if (!custAttr.AttributeType.FullName.Contains("Harmony")) { continue; }
+                        if (!custAttr.AttributeType.FullName.Contains("Harmony"))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            isHarmony = true;
+                        }
 
                         if (custAttr.HasConstructorArguments)
                         {
@@ -353,9 +508,9 @@ namespace BasketWeaverInjector
                                             methodStr = GetMethodTypeString(methodType, methodStr);
                                             break;
                                         }
-                                    
-                                    
-                                        // They don't change, but for now
+
+
+                                    // They don't change, but for now
                                     case "HarmonyLib.MethodType":
                                         {
                                             HarmonyLib.MethodType methodType = (HarmonyLib.MethodType)arg.Value;
@@ -373,19 +528,22 @@ namespace BasketWeaverInjector
                             }
                         }
                     }
+
                     if (methodStr != "")
                     {
+
                         typeStr = typeStr.Replace('/', '.');
                         Console.WriteLine(
                             $"[{type.Module.Name}] {typeStr}::{methodStr}"
                         );
                         string str = typeStr + "::" + methodStr;
-                        ConflictDict[str.Replace("/", ".")] = new ConflictData(typeStr.ToString(), methodStr.ToString());
+                        methodConflicts[str.Replace("/", ".")] = new ConflictData(typeStr.ToString(), methodStr.ToString());
+                        typeConflicts[typeStr] = new ConflictData(typeStr.ToString(), "");
 
                     }
                 }
             }
-                
+
             modResolver.Dispose();
         }
     }

@@ -9,7 +9,6 @@
     <!-- All mods and utilites are libraries and produce a dll -->
     <OutputType>Library</OutputType>
     <!-- The latest BattleTech game version uses .NET Framework 4.7.2, newer target frameworks won't work -->
-    <TargetFramework>net472</TargetFramework>
     <!-- Set to a modern version, some newer language feature are not available in combination with .NET Framework -->
     <LangVersion>13</LangVersion>
     <!-- We ask msbuild to only use reference DLLs found the BattleTech Managed directory -->
@@ -22,6 +21,7 @@
     <DebugType>embedded</DebugType>
     <!-- ignore some warning -->
     <NoWarn>CS0436</NoWarn> <!-- CS0436: same namespace+classname warning, e.g. happens due to GitVersion generated classes not having distinct namespaces -->
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
 
   <!-- helpful direct access to resources in BT, might trigger IDE indexing and can introduce lag/stutter -->
@@ -47,6 +47,8 @@
     <!-- avoids IgnoresAccessChecksToAttribute warnings -->
     <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
     <RepositoryType>git</RepositoryType>
+    <TargetFrameworks>net472</TargetFrameworks>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <!-- Allows to access internal and private members without Harmony Traverse, do not use if inheriting from classes made public -->
@@ -73,7 +75,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>$(BattleTechGameDir\BattleTech_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\BATTLETECH\BattleTech_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <HintPath>C:\Users\blackbird\.nuget\packages\microsoft.csharp\4.7.0\lib\netstandard2.0\Microsoft.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(BattleTechGameDir)\BattleTech_Data\Managed\Newtonsoft.Json.dll</HintPath>
@@ -84,6 +89,9 @@
     </Reference>
     <Reference Include="System.Core">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\BATTLETECH\BattleTech_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <!-- Main game library, best to publicize it to access internals easily and efficently -->
   </ItemGroup>

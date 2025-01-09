@@ -4,14 +4,21 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Internal;
 
-namespace BasketWeaver
+namespace Inject
 {
     namespace UnityEngine
     {
+        // New Function
+        public struct UserVector
+        {
+            public int x; 
+            public int y;
+            public int z;
+        }
+
         // Token: 0x02000141 RID: 321
         public struct Vector3 : IEquatable<Vector3>
         {
-
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void AssignTest(float x, float y, float z)

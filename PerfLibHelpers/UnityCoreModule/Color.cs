@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using UnityEngine;
 
 // Helper Namespace, referenced and removed by BasketWeaver during Injetion
-namespace BasketWeaver
+namespace Inject
 {
     namespace UnityEngine
     {
@@ -98,6 +99,7 @@ namespace BasketWeaver
 
             public override string ToString()
             {
+
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append("RGBA(");
                 stringBuilder.Append(this.r.ToString("F3"));

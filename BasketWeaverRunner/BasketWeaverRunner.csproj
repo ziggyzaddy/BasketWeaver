@@ -6,10 +6,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Cecil">
-      <HintPath>$(BattleTechGameDir)\Mods\ModTek\Mono.Cecil.dll</HintPath>
+      <HintPath>$(BattleTechGameDir)\Mods\ModTek\lib\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\BATTLETECH\Mods\ModTek\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>$(BattleTechGameDir)\Mods\ModTek\lib\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

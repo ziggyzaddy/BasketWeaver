@@ -7,7 +7,7 @@ using System.Linq;
 using System.IO;
 
 // BasketWeaver namespace reserved for Helpers and Mod types
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     public class Weaver
     {

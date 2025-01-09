@@ -21,16 +21,16 @@ By default, BasketWeaver uses three components:
 
 ## BasketWeaver
 
-BasketWeaver will be installed by default into `BattleTech/Mods/BasketWeaver`. This parent mod has minimal functionality and is used to provide a container for Helper Libraries that BasketWeaverInjector will load during the ModTek's injection phase.
+BasketWeaver installs by default into `BattleTech/Mods/BasketWeaver`. This parent mod has minimal functionality and is used to provide a container for Helper Libraries that BasketWeaverInjector will load during the ModTek's injection phase.
 
 ## BasketWeaverInjector
 
-BasketWeaver will be installed by default into `BattleTech/Mods/ModTek/Injectors/BasketWeaverInjector.dll`. It provides the following default capabilities:
+BasketWeaver installs by default into `BattleTech/Mods/ModTek/Injectors/BasketWeaverInjector.dll`. It provides the following capabilities:
 * Injects helpers from `/Mods/BasketWeaver/Helpers/` into the game
 * Basic heuristics for automated inlining of specified `Modules`/`.DLLs`
 * Conflict detection to avoid injecting or inlining methods that may bypass Harmony patches. This could occur due to inlining relocating instructions to caller methods and bypassing the patched methods.
 
-A configuration file in `BattleTech/Mods/ModTek/Injectors/BasketWeaver/.json` is provided to toggle `Helper Injection` and `Automated Inlining` routines. It can also specific a desired `Helper Namespace`, set to `BasketWeaver` to start.
+A configuration file in `BattleTech/Mods/ModTek/Injectors/BasketWeaver.json` is provided to toggle `Helper Injection` and `Automated Inlining` routines. It can also specific a desired `Helper Namespace`, set to `BasketWeaver` to start.
 
 Automated inlining attempts to speed up Unity Engine and game performance by detecting methods that can be inlined. It naively uses method instructions and method attributes to identify wrapper-like functions that can be safely inlined at minimal cost. Due to the nature of possible Harmony bypasses, this should be specified carefully and may break runtime behavior.
 

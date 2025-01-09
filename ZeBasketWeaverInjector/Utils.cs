@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 using Mono.Cecil;
 
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
-
     public class Utils
     {
         // Remove the Wrapper Namespace when injecting

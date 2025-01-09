@@ -4,16 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     public class InjectableDefinitions
     {
         public Dictionary<string, AssemblyDefinition> Definitions = new Dictionary<string, AssemblyDefinition>();
         IAssemblyResolver Resolver;
-        public InjectableDefinitions(IAssemblyResolver resolver, ModConfig config)
+        public InjectableDefinitions(IAssemblyResolver resolver, Settings config)
         {
             Resolver = resolver;
             foreach (var path in config.InjectableDefinitions)
@@ -35,11 +36,13 @@ namespace BasketWeaverInjector
                 }
                 if (resolved && (assem != null))
                 {
+                    Console.WriteLine($"Injectable DLL: {path}");
                     // .Name contains the name as Module.dll
                     Definitions.Add(assem.MainModule.Name, assem);
                 }
             }
         }
+
 
         // Use name of module (with .dll)
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]

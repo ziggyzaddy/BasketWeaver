@@ -1,6 +1,6 @@
 ﻿using Mono.Cecil;
 
-namespace BasketWeaverInjector
+namespace BasketWeaver
 {
     public interface IInjector
     {
