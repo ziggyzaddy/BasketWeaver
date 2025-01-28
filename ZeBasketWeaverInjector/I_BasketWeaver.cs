@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Diagnostics;
 
 namespace BasketWeaver
 {
@@ -23,7 +24,6 @@ namespace BasketWeaver
         // Must be local to the injector
         private string SettingsFile = "ZeBasketWeaverInjector.json";
 
-
         ConflictDetect Conflicts;
         InjectableDefinitions Definitions;
 
@@ -33,6 +33,9 @@ namespace BasketWeaver
             string curDir = Directory.GetCurrentDirectory();
             string searchPath = Path.Combine(curDir + InjectorPath);
             Settings config = new Settings();
+
+            StackTrace trace = new StackTrace();
+            
 
             bool foundSettings = false;
             if (Directory.Exists(searchPath))

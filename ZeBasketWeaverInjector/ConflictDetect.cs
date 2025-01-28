@@ -30,16 +30,10 @@ namespace BasketWeaver
 
     public class ConflictDetect
     {
-        // Uses ExtractSig
-        Dictionary<string, ConflictData> methodConflicts = new Dictionary<string, ConflictData>();
-        // FullName?
-        Dictionary<string, ConflictData> typeConflicts = new Dictionary<string, ConflictData>();
-
-        DefaultAssemblyResolver modResolver = new DefaultAssemblyResolver();
-
-
-
-
+        // Uses ExtractSig for type
+        Dictionary<string, ConflictData> _methodConflicts = new Dictionary<string, ConflictData>();
+        Dictionary<string, ConflictData> _typeConflicts = new Dictionary<string, ConflictData>();
+        DefaultAssemblyResolver _modResolver = new DefaultAssemblyResolver();
 
         List<string> AvoidDetect = new List<string>
         {
@@ -51,22 +45,18 @@ namespace BasketWeaver
             "mono",
             "sqlite",
             "SimdJsonNative"
-
         };
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TypeDefConflictCheck(TypeDefinition typeDef)
         {
-
-            if (typeConflicts.TryGetValue(typeDef.FullName, out var conflict))
+            if (_typeConflicts.TryGetValue(typeDef.FullName, out var conflict))
             {
                 Console.WriteLine($"     [SKIP - TYPE] {typeDef.FullName}");
                 return true;
             }
             return false;
-
-
         }
 
 
@@ -76,7 +66,7 @@ namespace BasketWeaver
         {
             string conflictCheck = methodDef.DeclaringType.FullName + "::" + methodDef.Name;
 
-            if (methodConflicts.TryGetValue(conflictCheck, out var conflict))
+            if (_methodConflicts.TryGetValue(conflictCheck, out var conflict))
             {
                 Console.WriteLine($"     [SKIP - DEF] {methodDef.DeclaringType.FullName}::{methodDef.Name}");
                 return true;
@@ -91,12 +81,11 @@ namespace BasketWeaver
         {
             string conflictCheck = methodRef.DeclaringType.FullName + "::" + methodRef.Name;
 
-            if (methodConflicts.TryGetValue(conflictCheck, out var conflict))
+            if (_methodConflicts.TryGetValue(conflictCheck, out var conflict))
             {
                 Console.WriteLine($"     [SKIP - REF] {methodRef.DeclaringType.FullName}::{methodRef.Name}");
                 return true;
             }
-
             return false;
         }
 
@@ -136,11 +125,8 @@ namespace BasketWeaver
                         }
                 }
             }
-
             return false;
         }
-
-
 
         public static void PrintCustomAttribute(CustomAttribute customAttribute)
         {
@@ -181,7 +167,6 @@ namespace BasketWeaver
                     Console.Write($"{field.Argument.ToString()} {field.Name?.ToString()} ");
                 }
             }
-
             Console.WriteLine(customAttribute.AttributeType.FullName);
         }
 
@@ -272,7 +257,7 @@ namespace BasketWeaver
                 Mono.Cecil.AssemblyDefinition referenceDef = null;
                 try
                 {
-                    referenceDef = modResolver.Resolve(new Mono.Cecil.AssemblyNameReference(injectableDef.Key.Replace(".dll", ""), null));
+                    referenceDef = _modResolver.Resolve(new Mono.Cecil.AssemblyNameReference(injectableDef.Key.Replace(".dll", ""), null));
                 }
                 catch (Exception e)
                 {
@@ -337,10 +322,10 @@ namespace BasketWeaver
 
                                     Console.WriteLine($"Detected Diff Method [INSTR_CNT]: {method.Value.FullName}");
 
-                                    Console.WriteLine($"### Original Method:");
-                                    Formatter.PrintMethod(refMethod);
-                                    Console.WriteLine($"### New Method:");
-                                    Formatter.PrintMethod(method.Value);
+                                    //Console.WriteLine($"### Original Method:");
+                                    //Formatter.PrintMethod(refMethod);
+                                    //Console.WriteLine($"### New Method:");
+                                    //Formatter.PrintMethod(method.Value);
                                 }
                             }
                         }
@@ -392,7 +377,7 @@ namespace BasketWeaver
             }
             Console.WriteLine($"Found Mod Dir: {modDir}");
             string[] modDlls = Directory.GetFiles(modDir, "*.dll", SearchOption.AllDirectories);
-            modResolver.AddSearchDirectory(Path.Combine(curDir, "/BattleTech_Data/Managed"));
+            _modResolver.AddSearchDirectory(Path.Combine(curDir, "/BattleTech_Data/Managed"));
 
             Console.WriteLine($"Running Conflict Detection for Harmony");
 
@@ -400,8 +385,9 @@ namespace BasketWeaver
             {
                 if (modDll.Contains("AssembliesInjected")) { continue; }
                 if (modDll.Contains("AssembliesShimmed")) { continue; }
+                if (modDll.Contains("ModTek") && !modDll.Contains("Injectors")) { continue; }
                 Console.WriteLine($"Adding Path {Path.GetDirectoryName(modDll)}");
-                modResolver.AddSearchDirectory(Path.GetDirectoryName(modDll));
+                _modResolver.AddSearchDirectory(Path.GetDirectoryName(modDll));
             }
             foreach (var modDll in modDlls)
             {
@@ -427,7 +413,7 @@ namespace BasketWeaver
                     continue;
                 }
 
-                var assembly = modResolver.Resolve(new AssemblyNameReference(Path.GetFileNameWithoutExtension(modDll), null));
+                var assembly = _modResolver.Resolve(new AssemblyNameReference(Path.GetFileNameWithoutExtension(modDll), null));
 
                 // Do not add the injector to conflict detect.
                 if (assembly.MainModule == null)
@@ -537,14 +523,14 @@ namespace BasketWeaver
                             $"[{type.Module.Name}] {typeStr}::{methodStr}"
                         );
                         string str = typeStr + "::" + methodStr;
-                        methodConflicts[str.Replace("/", ".")] = new ConflictData(typeStr.ToString(), methodStr.ToString());
-                        typeConflicts[typeStr] = new ConflictData(typeStr.ToString(), "");
+                        _methodConflicts[str.Replace("/", ".")] = new ConflictData(typeStr.ToString(), methodStr.ToString());
+                        _typeConflicts[typeStr] = new ConflictData(typeStr.ToString(), "");
 
                     }
                 }
             }
 
-            modResolver.Dispose();
+            _modResolver.Dispose();
         }
     }
 }

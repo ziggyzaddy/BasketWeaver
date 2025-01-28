@@ -266,7 +266,7 @@ namespace Inject
                 else
                 {
                     float f = Mathf.Clamp(Vector2.Dot(from, to) / num, -1f, 1f);
-                    result = (float)System.Math.Acos(f) * 57.29578f;
+                    result = (float)Math.Acos(f) * 57.29578f;
                 }
                 return result;
             }

@@ -12,6 +12,7 @@ namespace Inject
         public struct Matrix4x4 : IEquatable<Matrix4x4>
         {
             // Token: 0x06000C61 RID: 3169 RVA: 0x00010144 File Offset: 0x0000E344
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Matrix4x4(Vector4 column0, Vector4 column1, Vector4 column2, Vector4 column3)
             {
                 this.m00 = column0.x;
@@ -31,8 +32,8 @@ namespace Inject
                 this.m32 = column2.w;
                 this.m33 = column3.w;
             }
-
             // Token: 0x06000C62 RID: 3170 RVA: 0x00010224 File Offset: 0x0000E424
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private Quaternion GetRotation()
             {
                 Quaternion result;
@@ -41,6 +42,7 @@ namespace Inject
             }
 
             // Token: 0x06000C63 RID: 3171 RVA: 0x0001023C File Offset: 0x0000E43C
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private Vector3 GetLossyScale()
             {
                 Vector3 result;
@@ -49,18 +51,21 @@ namespace Inject
             }
 
             // Token: 0x06000C64 RID: 3172 RVA: 0x00010252 File Offset: 0x0000E452
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsIdentity()
             {
                 return Matrix4x4.IsIdentity_Injected(ref this);
             }
 
             // Token: 0x06000C65 RID: 3173 RVA: 0x0001025A File Offset: 0x0000E45A
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private float GetDeterminant()
             {
                 return Matrix4x4.GetDeterminant_Injected(ref this);
             }
 
             // Token: 0x06000C66 RID: 3174 RVA: 0x00010264 File Offset: 0x0000E464
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private FrustumPlanes DecomposeProjection()
             {
                 FrustumPlanes result;
@@ -72,6 +77,7 @@ namespace Inject
             // (get) Token: 0x06000C67 RID: 3175 RVA: 0x0001027C File Offset: 0x0000E47C
             public Quaternion rotation
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this.GetRotation();
@@ -82,6 +88,7 @@ namespace Inject
             // (get) Token: 0x06000C68 RID: 3176 RVA: 0x00010298 File Offset: 0x0000E498
             public Vector3 lossyScale
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this.GetLossyScale();
@@ -92,6 +99,7 @@ namespace Inject
             // (get) Token: 0x06000C69 RID: 3177 RVA: 0x000102B4 File Offset: 0x0000E4B4
             public bool isIdentity
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this.IsIdentity();
@@ -102,6 +110,7 @@ namespace Inject
             // (get) Token: 0x06000C6A RID: 3178 RVA: 0x000102D0 File Offset: 0x0000E4D0
             public float determinant
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this.GetDeterminant();
@@ -112,6 +121,7 @@ namespace Inject
             // (get) Token: 0x06000C6B RID: 3179 RVA: 0x000102EC File Offset: 0x0000E4EC
             public FrustumPlanes decomposeProjection
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this.DecomposeProjection();
@@ -119,18 +129,21 @@ namespace Inject
             }
 
             // Token: 0x06000C6C RID: 3180 RVA: 0x00010307 File Offset: 0x0000E507
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool ValidTRS()
             {
                 return Matrix4x4.ValidTRS_Injected(ref this);
             }
 
             // Token: 0x06000C6D RID: 3181 RVA: 0x00010310 File Offset: 0x0000E510
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static float Determinant(Matrix4x4 m)
             {
                 return m.determinant;
             }
 
             // Token: 0x06000C6E RID: 3182 RVA: 0x0001032C File Offset: 0x0000E52C
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 TRS(Vector3 pos, Quaternion q, Vector3 s)
             {
                 Matrix4x4 result;
@@ -139,12 +152,14 @@ namespace Inject
             }
 
             // Token: 0x06000C6F RID: 3183 RVA: 0x00010347 File Offset: 0x0000E547
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void SetTRS(Vector3 pos, Quaternion q, Vector3 s)
             {
                 this = Matrix4x4.TRS(pos, q, s);
             }
 
             // Token: 0x06000C70 RID: 3184 RVA: 0x00010358 File Offset: 0x0000E558
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Inverse(Matrix4x4 m)
             {
                 Matrix4x4 result;
@@ -156,6 +171,7 @@ namespace Inject
             // (get) Token: 0x06000C71 RID: 3185 RVA: 0x00010370 File Offset: 0x0000E570
             public Matrix4x4 inverse
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return Matrix4x4.Inverse(this);
@@ -163,6 +179,7 @@ namespace Inject
             }
 
             // Token: 0x06000C72 RID: 3186 RVA: 0x00010390 File Offset: 0x0000E590
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Transpose(Matrix4x4 m)
             {
                 Matrix4x4 result;
@@ -174,6 +191,7 @@ namespace Inject
             // (get) Token: 0x06000C73 RID: 3187 RVA: 0x000103A8 File Offset: 0x0000E5A8
             public Matrix4x4 transpose
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return Matrix4x4.Transpose(this);
@@ -181,6 +199,7 @@ namespace Inject
             }
 
             // Token: 0x06000C74 RID: 3188 RVA: 0x000103C8 File Offset: 0x0000E5C8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
             {
                 Matrix4x4 result;
@@ -189,6 +208,7 @@ namespace Inject
             }
 
             // Token: 0x06000C75 RID: 3189 RVA: 0x000103E8 File Offset: 0x0000E5E8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar)
             {
                 Matrix4x4 result;
@@ -197,6 +217,7 @@ namespace Inject
             }
 
             // Token: 0x06000C76 RID: 3190 RVA: 0x00010404 File Offset: 0x0000E604
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 LookAt(Vector3 from, Vector3 to, Vector3 up)
             {
                 Matrix4x4 result;
@@ -205,6 +226,7 @@ namespace Inject
             }
 
             // Token: 0x06000C77 RID: 3191 RVA: 0x00010420 File Offset: 0x0000E620
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Frustum(float left, float right, float bottom, float top, float zNear, float zFar)
             {
                 Matrix4x4 result;
@@ -213,6 +235,7 @@ namespace Inject
             }
 
             // Token: 0x06000C78 RID: 3192 RVA: 0x00010440 File Offset: 0x0000E640
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Frustum(FrustumPlanes fp)
             {
                 return Matrix4x4.Frustum(fp.left, fp.right, fp.bottom, fp.top, fp.zNear, fp.zFar);
@@ -221,10 +244,12 @@ namespace Inject
             // Token: 0x1700029D RID: 669
             public float this[int row, int column]
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return this[row + column * 4];
                 }
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 set
                 {
                     this[row + column * 4] = value;
@@ -234,6 +259,7 @@ namespace Inject
             // Token: 0x1700029E RID: 670
             public float this[int index]
             {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     float result;
@@ -292,6 +318,8 @@ namespace Inject
                     }
                     return result;
                 }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 set
                 {
                     switch (index)
@@ -351,24 +379,28 @@ namespace Inject
             }
 
             // Token: 0x06000C7D RID: 3197 RVA: 0x00010700 File Offset: 0x0000E900
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override int GetHashCode()
             {
                 return this.GetColumn(0).GetHashCode() ^ this.GetColumn(1).GetHashCode() << 2 ^ this.GetColumn(2).GetHashCode() >> 2 ^ this.GetColumn(3).GetHashCode() >> 1;
             }
 
             // Token: 0x06000C7E RID: 3198 RVA: 0x00010774 File Offset: 0x0000E974
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override bool Equals(object other)
             {
                 return other is Matrix4x4 && this.Equals((Matrix4x4)other);
             }
 
             // Token: 0x06000C7F RID: 3199 RVA: 0x000107A8 File Offset: 0x0000E9A8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Equals(Matrix4x4 other)
             {
                 return this.GetColumn(0).Equals(other.GetColumn(0)) && this.GetColumn(1).Equals(other.GetColumn(1)) && this.GetColumn(2).Equals(other.GetColumn(2)) && this.GetColumn(3).Equals(other.GetColumn(3));
             }
 
             // Token: 0x06000C80 RID: 3200 RVA: 0x00010830 File Offset: 0x0000EA30
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 operator *(Matrix4x4 lhs, Matrix4x4 rhs)
             {
                 Matrix4x4 result;
@@ -392,6 +424,7 @@ namespace Inject
             }
 
             // Token: 0x06000C81 RID: 3201 RVA: 0x00010CA8 File Offset: 0x0000EEA8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Vector4 operator *(Matrix4x4 lhs, Vector4 vector)
             {
                 Vector4 result;
@@ -403,18 +436,21 @@ namespace Inject
             }
 
             // Token: 0x06000C82 RID: 3202 RVA: 0x00010DD8 File Offset: 0x0000EFD8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool operator ==(Matrix4x4 lhs, Matrix4x4 rhs)
             {
                 return lhs.GetColumn(0) == rhs.GetColumn(0) && lhs.GetColumn(1) == rhs.GetColumn(1) && lhs.GetColumn(2) == rhs.GetColumn(2) && lhs.GetColumn(3) == rhs.GetColumn(3);
             }
 
             // Token: 0x06000C83 RID: 3203 RVA: 0x00010E54 File Offset: 0x0000F054
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool operator !=(Matrix4x4 lhs, Matrix4x4 rhs)
             {
                 return !(lhs == rhs);
             }
 
             // Token: 0x06000C84 RID: 3204 RVA: 0x00010E74 File Offset: 0x0000F074
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector4 GetColumn(int index)
             {
                 Vector4 result;
@@ -451,6 +487,7 @@ namespace Inject
             }
 
             // Token: 0x06000C85 RID: 3205 RVA: 0x00010F38 File Offset: 0x0000F138
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector4 GetRow(int index)
             {
                 Vector4 result;
@@ -487,6 +524,7 @@ namespace Inject
             }
 
             // Token: 0x06000C86 RID: 3206 RVA: 0x00010FF9 File Offset: 0x0000F1F9
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void SetColumn(int index, Vector4 column)
             {
                 this[0, index] = column.x;
@@ -496,6 +534,7 @@ namespace Inject
             }
 
             // Token: 0x06000C87 RID: 3207 RVA: 0x00011038 File Offset: 0x0000F238
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void SetRow(int index, Vector4 row)
             {
                 this[index, 0] = row.x;
@@ -505,6 +544,7 @@ namespace Inject
             }
 
             // Token: 0x06000C88 RID: 3208 RVA: 0x00011078 File Offset: 0x0000F278
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector3 MultiplyPoint(Vector3 point)
             {
                 Vector3 result;
@@ -520,6 +560,7 @@ namespace Inject
             }
 
             // Token: 0x06000C89 RID: 3209 RVA: 0x000111A8 File Offset: 0x0000F3A8
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector3 MultiplyPoint3x4(Vector3 point)
             {
                 Vector3 result;
@@ -530,6 +571,7 @@ namespace Inject
             }
 
             // Token: 0x06000C8A RID: 3210 RVA: 0x0001126C File Offset: 0x0000F46C
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public Vector3 MultiplyVector(Vector3 vector)
             {
                 Vector3 result;
@@ -559,6 +601,7 @@ namespace Inject
             //}
 
             // Token: 0x06000C8C RID: 3212 RVA: 0x00011434 File Offset: 0x0000F634
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Scale(Vector3 vector)
             {
                 Matrix4x4 result;
@@ -582,6 +625,7 @@ namespace Inject
             }
 
             // Token: 0x06000C8D RID: 3213 RVA: 0x00011510 File Offset: 0x0000F710
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Translate(Vector3 vector)
             {
                 Matrix4x4 result;
@@ -605,6 +649,7 @@ namespace Inject
             }
 
             // Token: 0x06000C8E RID: 3214 RVA: 0x000115EC File Offset: 0x0000F7EC
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Matrix4x4 Rotate(Quaternion q)
             {
                 float num = q.x * 2f;
@@ -643,6 +688,7 @@ namespace Inject
             // (get) Token: 0x06000C8F RID: 3215 RVA: 0x00011764 File Offset: 0x0000F964
             public static Matrix4x4 zero
             {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return Matrix4x4.zeroMatrix;
@@ -653,6 +699,7 @@ namespace Inject
             // (get) Token: 0x06000C90 RID: 3216 RVA: 0x00011780 File Offset: 0x0000F980
             public static Matrix4x4 identity
             {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 get
                 {
                     return Matrix4x4.identityMatrix;
@@ -660,6 +707,7 @@ namespace Inject
             }
 
             // Token: 0x06000C91 RID: 3217 RVA: 0x0001179C File Offset: 0x0000F99C
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override string ToString()
             {
                 return string.Format("{0:F5}\t{1:F5}\t{2:F5}\t{3:F5}\n{4:F5}\t{5:F5}\t{6:F5}\t{7:F5}\n{8:F5}\t{9:F5}\t{10:F5}\t{11:F5}\n{12:F5}\t{13:F5}\t{14:F5}\t{15:F5}\n", new object[]
@@ -684,6 +732,7 @@ namespace Inject
             }
 
             // Token: 0x06000C92 RID: 3218 RVA: 0x000118AC File Offset: 0x0000FAAC
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public string ToString(string format)
             {
                 return string.Format("{0}\t{1}\t{2}\t{3}\n{4}\t{5}\t{6}\t{7}\n{8}\t{9}\t{10}\t{11}\n{12}\t{13}\t{14}\t{15}\n", new object[]

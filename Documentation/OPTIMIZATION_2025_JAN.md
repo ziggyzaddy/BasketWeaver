@@ -1,0 +1,134 @@
+## BattleTech 2018 Modded Optimization Notes - 2025 JAN
+     
+This document highlights AI optimization efforts, starting with initial profiling of CleverGirl. Though generally applicable, modpacks using ModTek and the following mods will be impacted:
+- [StrategicOperations](https://github.com/BattletechModders/StrategicOperations)
+- [TisButAScratch](https://github.com/BattletechModders/TisButAScratch)
+- [LowVisibility](https://github.com/BattletechModders/LowVisibility)
+- [IRBTModUtils](https://github.com/BattletechModders/IRBTModUtils)
+- [MechEngineer](https://github.com/BattletechModders/MechEngineer)
+- [CustomAmmoCategories](https://github.com/BattletechModders/CustomAmmoCategories)
+- [CustomComponents](https://github.com/BattletechModders/CustomComponents)
+
+### Assumptions
+- Mathematical complexity of influence map calculations contributed to AI think time
+- Time was lost in Line of Sight (LOS) and Line of Fire (LOF) checking
+- Bresenham was a major contributor to think time.
+
+### Initial Steps
+- CleverGirl instrumented manually and > `100 ms` slowdowns printed in logs.
+- Found `*_PositionalFactor` evaluations took > `1 sec` when units had large movement ranges, more ammo modes, or multi-shot weaponry.
+- Manual profiling of log functions showed > ~`1 sec` per turn accumulated
+- Past profiling data and flame-graphs were reviewed
+- Profiler access enabled DotTrace visualization/flamegraphs
+
+## Common Notes
+- .NET string processing and formatting frequently allocates new strings, taking up time, memory, and increasing Garbage Collector runtimes through underlying `mallocs` and `callocs`.
+- Allocating memory done frequently with strings where integers, bools, or enums can be used.
+- General memoization needed where performance concerns arise, often due to string comparisons over lists/loops.
+- Encoding is expensive, and Mono has UTF8 encoding overhead and string allocations for Reflection calls and naively implemented Managed <-> Native marshalling.
+- Due to extensive logging, formatting, buffer writing, encoding, and flush overhead can back up main. Performance worse on HDD and older SATA/M.2 SSD.
+- Mono `InternalCall` overhead can range from 5 to 16ns, and more when marshalling data.
+- Call stack overhead is non-negligible, inclusive `InternalCall` overhead. This may remove performance benefits when JIT is faster than native implementation.
+
+## Optimization - In Mission:
+
+### Asynchronous Logging - `IRBTModUtils.DeferredLogger`
+Identification:
+- Manual instrumentation through CleverGirl (profiler initially unavailable)
+- Enabling LowVis trace increased logging times to > ~`2 sec` per turn.
+- `String.Concat`, `DateTime.ToString`, `StreamWriter.WriteLine()`, `StreamWriter.Flush()` found to contribute to main thread execution times
+
+Fix:
+- [PR](https://github.com/BattletechModders/IRBTModUtils/pull/16)
+- Offload string processing and flush overhead from main to an asynchronous logging thread, and reduce allocations/CPU time
+- `String.Concat` replaced by allocating async thread local buffer and directly formatting DateTime through a zero-alloc function inclusive concatenation spaces. Reduced runtime allocations to zero.
+- Reduced redundant formatting, queued writes, and flushed messages contiguously by specified file
+- Marshal message data through a fast MPMC (Multiple Producer Multiple Consumer) concurrent circular buffer, prototypical of the modern .NET9 ConcurrentQueue implementation.
+
+
+### Removing StartsWith -  `StartsWith(DebilitatedPrefix)`
+
+Identification:
+- `Pilot.IsIncapacitated.Getter.Postfix` is frequently called by CleverGirl through Strategic Operations.
+- `GetAllFriendlies` frequently calls `GetIsDead`.
+
+Fix:
+- [PR](https://github.com/BattletechModders/TisButAScratch/pull/5)
+- `StatCollection` memoized the tags and removed iteration of ParentActor tags.
+- `StartsWith` is an expensive call due to string processing and allocations, and was called ~12.5M times on a turn when profiled.
+
+### Reducing TagSet Use - `HBS.TagSet`
+Identification:
+- `HBS.Collections.TagSet.AddRange()`.
+- In AI under `CustomAmmoCategoriesPatches.ToHit_GetAllModifiers()`.
+
+Fix:
+- [PR](https://github.com/BattletechModders/CustomAmmoCategories/pull/33)
+- Convert instances using TagSet.AddRange() to StatCollections
+- Target hot-spot uses first through StatCollections, eventually add injected fields.
+- Trades string allocations for dictionary lookup overhead, which is significantly faster
+
+### Evasion Reflection - `CustomAmmoCategoriesPatches.ToHit_GetEvasivePipsModifier`
+Identification:
+- `System.RuntimeType.GetField()` took > `500msec`in `CustAmmoCategories.ToHitModifiersHelper`
+- Used when getting the `CombatGameState`
+
+Fix:
+- Use `Krafs.Publicizer` to directly access the field and eliminate reflection overhead due to Mono.
+- Similar optimizations for to `CustomTranslation.Interpolator_Interpolate` and other instances using Reflection/Traverse
+
+
+### Placeholder Interpolation - `MechEngineer.InterpolateText`
+
+Identification:
+- `MechEngineers.AccuracyEffectsFeature.AccuracyForLocation` frequently called `System.Enum.ToString()` for returning `LocationId`.
+- Causes reflection overhead through `System.RuntimeType.IsDefined` and alloc overhead through `ToString` 
+
+
+Fix:
+- [Commit](https://github.com/BattletechModders/MechEngineer/commit/7521fe2eae83d70dc0cbb0f83d542562ac4da9c7): Locations are currently fixed, return string directly through switch - case statement.
+- [Commit](https://github.com/BattletechModders/MechEngineer/commit/b8a5a8508d4dce1de82c4ca13d8e75c287af04c8): Further improvements to `AccuracyFeature` through adding `StatCollection` in `AccuracyForKey` and `AccuracyForLocation`
+
+
+### MonsterMashup - `HasCollisionAt`
+Identification: 
+- Found in  `MonsterMashup.Patch.PathNode_HasCollisionAt`
+- Overlapping actors checked using Unique ID string equality 
+
+Fix:
+- [PR](https://github.com/BattletechModders/MonsterMashup/pull/3): Map Unique ID to integers and compare through dictionary lookups to avoid string comparison overhead
+
+### Off Screen Rendering - `SphericalHarmonics.Evaluate()`
+Identification:
+- Found when rendering OffScreen cameras
+- Mono `InternalCall` return of `[Out] Color` caused marshalling overhead due to type reflection
+
+Fix:
+- Reimplement Normal -> Color calculation for Spherical Harmonics based on reference shader `.cginc` on CPU
+- Uses `Stupid Spherical Harmonics` - GDC 2008 as implemented in Unity.
+- Differences in Native call to Mono JIT negligible, as marshalling takes up bulk of profile time.
+
+### Unity Core Module - Mathematics
+Identification:
+- `Vector3` operations frequently used the following pattern after calculations, adding ~`10ns` to function overhead
+```csharp
+return new Vector3(x,y,z);
+```
+- Math operations that operate without crossing ordinates can reuse the left-hand-side (LHS) as storage since struct is passed by value.
+- `Vector3.ToString()` returns a new object formatter.
+- Unity wraps `System.Mathf` operations with helpers to hide casting from caller. Adds function call overhead as inlining not adequately applied by runtime
+
+Fix:
+- Reuse LHS parameter as storage when returning results to avoid new allocation
+- Replace `ToString` with `StringBuilder`. This is faster than original implementation, but may require further optimization since UTF16 -> UTF8 encoding will not expand in practice
+- Declare temporary storage when ordinates require temporary calculations (i.e. Cross Product). Do not call constructor
+- Directly call `System.Mathf` operations and cast.
+- Overall impact of `~30%` to `~80%` for all `VectorX`, `VectorXInt`, `Color` and relevant `Matrix4x4` methods where replaced in weaver.
+
+### BasketWeaver - Automated Inlining
+Identification:
+- Older .NET version and bundled Unity runtime does not insert AggressiveInlining. Codebase contains many helper functions that can be heuristically inlined as per newer `dotnet/runtime` versions.
+
+Fix:
+- Implement automated inlining through backported heuristics at injection time. 
+- To avoid unpatching HarmonyX, conflict detection must be ran prior to inserting inlines

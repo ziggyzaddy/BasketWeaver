@@ -75,7 +75,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\BATTLETECH\BattleTech_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(BattleTechGameDir)\BATTLETECH\BattleTech_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp">
       <HintPath>C:\Users\blackbird\.nuget\packages\microsoft.csharp\4.7.0\lib\netstandard2.0\Microsoft.CSharp.dll</HintPath>
@@ -91,7 +91,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\BATTLETECH\BattleTech_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(BattleTechGameDir)\BATTLETECH\BattleTech_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <!-- Main game library, best to publicize it to access internals easily and efficently -->
   </ItemGroup>

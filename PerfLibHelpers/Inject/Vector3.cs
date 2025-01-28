@@ -385,6 +385,7 @@ namespace Inject
                     result = (float)Math.Acos(Mathf.Clamp(Vector3.Dot(from, to) / num, -1f, 1f)) * 57.29578f;
                 }
                 return result;
+                
             }
 
             // Token: 0x06000CC1 RID: 3265

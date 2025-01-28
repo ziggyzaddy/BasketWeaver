@@ -53,11 +53,11 @@ namespace BasketWeaver
                     {
 
                         // Safe Mode
-                        if (config.AutoInlineSafeMode)
-                        {
-                            method.AggressiveInlining = false;
-                            method.NoInlining = true;
-                        }
+                        //if (config.AutoInlineSafeMode)
+                        //{
+                        //    method.AggressiveInlining = false;
+                        //    method.NoInlining = true;
+                        //}
 
                         // Method conflict check == true if found
                         Console.WriteLine($"     [SKIP - HARMONY] {method.DeclaringType.FullName}::{method.Name}");

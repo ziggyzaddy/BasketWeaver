@@ -1,11 +1,11 @@
 {
   "HelperNamespace": "Inject",
-  "PrintReplacedIL": false,
+  "PrintReplacedIL": true,
   "PrintDiffIL": false,
   "RunHelpers": true,
   "RunAutoInline": true,
-  "AutoInlineSafeMode": true,
-  "HackBool": true,
+  "AutoInlineSafeMode": false,
+  "HackBool": false,
 
 
   "InjectableDefinitions": [
@@ -46,6 +46,7 @@
     "ShadowrunSerializer",
     "Sigil",
     "StringObfuscator",
+    "System",
     "System.Configuration",
     "System.Core",
     "System.Data",
@@ -164,6 +165,7 @@
     "ShadowrunSerializer",
     "Sigil",
     "StringObfuscator",
+    "System",
     "System.Configuration",
     "System.Core",
     "System.Data",

@@ -115,41 +115,39 @@ namespace BasketWeaver
 
                 foreach (var srcMethodData in srcMethods)
                 {
-                    
                     var srcMethod = srcMethodData.Value;
 
-                    if (!tgtMethods.TryGetValue(srcMethodData.Key, out MethodDefinition tgtMethod))
+                    // Method was found, continue on
+                    if (tgtMethods.TryGetValue(srcMethodData.Key, out MethodDefinition tgtMethod)) { continue; }
+
+                    Console.WriteLine("\n### NEW METHOD:");
+
+                    var newMethod = new MethodDefinition(srcMethod.Name, srcMethod.Attributes, srcMethod.ReturnType);
+                    tgtType.Methods.Add(newMethod);
+                    var editMethod = tgtType.Methods.Last();
+                    editMethod.DeclaringType = tgtType;
+                    editMethod.Body.Variables.Clear();
+                    editMethod.IsAbstract = srcMethod.IsAbstract;
+                    editMethod.IsStatic = srcMethod.IsStatic;
+                    editMethod.IsUnmanagedExport = srcMethod.IsUnmanagedExport;
+                    foreach (var variable in srcMethod.Body.Variables)
                     {
-                        Console.WriteLine("\n### NEW METHOD:");
-
-                        var newMethod = new MethodDefinition(srcMethod.Name, srcMethod.Attributes, srcMethod.ReturnType);
-                        tgtType.Methods.Add(newMethod);
-                        var editMethod = tgtType.Methods.Last();
-                        editMethod.DeclaringType = tgtType;
-                        editMethod.Body.Variables.Clear();
-                        editMethod.IsAbstract = srcMethod.IsAbstract;
-                        editMethod.IsStatic = srcMethod.IsStatic;
-                        editMethod.IsUnmanagedExport = srcMethod.IsUnmanagedExport;
-                        foreach (var variable in srcMethod.Body.Variables)
-                        {
-                            var newVariable = new VariableDefinition(tgtType.Module.ImportReference(variable.VariableType));
-                            editMethod.Body.Variables.Add(newVariable);
-                        }
-                        
-                        foreach (var param in srcMethod.Parameters)
-                        {
-                            editMethod.Parameters.Add(param);
-                        }
-                            
-                        editMethod.Body.MaxStackSize = srcMethod.Body.MaxStackSize;
-                        editMethod.Body = new MethodBody(srcMethod);
-                        var proc = editMethod.Body.GetILProcessor();
-                        
-                        string tgtSig = Utils.ExtractSig(editMethod);
-                        tgtMethods.Add(tgtSig, editMethod);
-                        Formatter.PrintMethod(editMethod);
-
+                        var newVariable = new VariableDefinition(tgtType.Module.ImportReference(variable.VariableType));
+                        editMethod.Body.Variables.Add(newVariable);
                     }
+
+                    foreach (var param in srcMethod.Parameters)
+                    {
+                        editMethod.Parameters.Add(param);
+                    }
+
+                    editMethod.Body.MaxStackSize = srcMethod.Body.MaxStackSize;
+                    editMethod.Body = new MethodBody(srcMethod);
+                    var proc = editMethod.Body.GetILProcessor();
+
+                    string tgtSig = Utils.ExtractSig(editMethod);
+                    tgtMethods.Add(tgtSig, editMethod);
+                    Formatter.PrintMethod(editMethod);
                 }
 
 
