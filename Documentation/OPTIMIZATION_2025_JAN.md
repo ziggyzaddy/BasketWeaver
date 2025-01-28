@@ -30,6 +30,33 @@ This document highlights AI optimization efforts, starting with initial profilin
 - Mono `InternalCall` overhead can range from 5 to 16ns, and more when marshalling data.
 - Call stack overhead is non-negligible, inclusive `InternalCall` overhead. This may remove performance benefits when JIT is faster than native implementation.
 
+## Optimization - Tooling:
+
+
+### .NET Standard 2.0 Facades
+Notes:
+- Initial attempts at speeding and improving AI had rationale for using either a compute shader language or scripting language to ease development.
+- Attempts were made to use .NET Standard 2.0 nuget packages in development.
+- Discussion of facade use kicked off collaborative efforts to improve runtime performance and tooling to handle performance improvements across ModTek and other areas of the game.
+
+Process:
+- Adding `Auto-generate binding redirects` to `.csproj` properties enables .NET Standard 2.0 dependencies to be resolved against .NET Framework 4.7.2.
+- The `netstandard.dll` provided in the built version of Mono bundled with Unity Editor shall be referenced. If a different version of Mono BGE (Bleeding Edge) is used, use the `netstandard.dll` compiled alongside the Mono version.
+- Ensure all facade `.dlls` are referenced as needed when using libraries dependent on core features. These are also provided alongside editor releases, and can be compiled if recompiling Mono.
+
+### ModTek .NET Standard 2.0 Injector Support
+Notes:
+- To solve a circular dependency, injectors were converted to support MSBuild of injector `.dlls` and run them at build time to support referencing injected variables without running the game.
+
+### BasketWeaver
+Notes:
+- As injectors require manually writing C# Intermediate Language (IL) for injecting fields, types, or modification/replacement of methods, tooling for weaving instructions through helper libraries was created
+- In addition to weaving capabilities, automated inlining using backports of salient .NET9 heuristics was added to improve performance for smaller helper functions and avoid call stack overhead.
+
+### Mono
+Notes:
+- To experiment under the hood, a Mono BGE (Bleeding Edge) version compatible with Unity 2018.4f2 was recompiled and replaced. `2018.4.15` built with debugging capabilities for `dnSpy` was used.
+
 ## Optimization - Startup:
 ### Asynchronous Logging - `ModTek.Features.Logging.MTLoggerAsyncQueue`
 Identification:
@@ -149,3 +176,8 @@ Fix:
 
 
 
+### References
+- [Current Mono Version](https://github.com/Unity-Technologies/mono/tree/unity-2018.4-mbe): Provides insight into runtime specifics, recompiled and ran for exploration and understanding
+- [.NET9 Performance Improvements](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/): Previous performance improvements included in links, and some techniques were backported or adapted as needed
+- [Unity Editor Archive](https://unity.com/releases/editor/archive): Used for `.dll` experimentation to integrated `.netstandard20` and understanding shaders for rendering and AI concerns
+-[]
