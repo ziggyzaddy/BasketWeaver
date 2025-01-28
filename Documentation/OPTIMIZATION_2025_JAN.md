@@ -1,6 +1,6 @@
 ## BattleTech 2018 Modded Optimization Notes - 2025 JAN
      
-This document highlights AI optimization efforts, starting with initial profiling of CleverGirl. Though generally applicable, modpacks using ModTek and the following mods will be impacted:
+This document highlights AI optimization efforts, starting with initial profiling of CleverGirl. Certain fixes are generally applicable, however modpacks using ModTek and the following mods will be more impacted:
 - [StrategicOperations](https://github.com/BattletechModders/StrategicOperations)
 - [TisButAScratch](https://github.com/BattletechModders/TisButAScratch)
 - [LowVisibility](https://github.com/BattletechModders/LowVisibility)
@@ -22,13 +22,26 @@ This document highlights AI optimization efforts, starting with initial profilin
 - Profiler access enabled DotTrace visualization/flamegraphs
 
 ## Common Notes
-- .NET string processing and formatting frequently allocates new strings, taking up time, memory, and increasing Garbage Collector runtimes through underlying `mallocs` and `callocs`.
+- .NET string processing and formatting frequently allocates new strings, take up time & memory, and increases Garbage Collector runtimes through underlying `mallocs` and `callocs`.
 - Allocating memory done frequently with strings where integers, bools, or enums can be used.
 - General memoization needed where performance concerns arise, often due to string comparisons over lists/loops.
 - Encoding is expensive, and Mono has UTF8 encoding overhead and string allocations for Reflection calls and naively implemented Managed <-> Native marshalling.
 - Due to extensive logging, formatting, buffer writing, encoding, and flush overhead can back up main. Performance worse on HDD and older SATA/M.2 SSD.
 - Mono `InternalCall` overhead can range from 5 to 16ns, and more when marshalling data.
 - Call stack overhead is non-negligible, inclusive `InternalCall` overhead. This may remove performance benefits when JIT is faster than native implementation.
+
+## Optimization - Startup:
+### Asynchronous Logging - `ModTek.Features.Logging.MTLoggerAsyncQueue`
+Identification:
+- ModTek already realized needs to provide async formatting, however stayed synchronous for critical messages.
+- Increased logging warranted ModTek to also be asynchronous for performance concerns and future redirect of logging from IRBTModUtils to ModTek.
+
+Fix:
+- [Commit](https://github.com/BattletechModders/ModTek/commit/d7ebcb92212927c341923367f6eaade0e7535939): Start of dispatch optimization and beginning of asynchronous optimization efforts following profiling of IRBTModUtils logger. ModTek carrying HBS Logging message load provided opportunity to further offload logging from main, and eventually redirect all logging through ModTek.
+- [Commit](https://github.com/BattletechModders/ModTek/commit/6559df4d7dfe247621caed6a090323e394394eca): Improve thread safety of asynchronous logging.
+- [Commit](https://github.com/BattletechModders/ModTek/commit/4d43fcb97d76054b5bbf0dc30485af37e9e77740): Remove more timestamp processing from main thread.
+- [Commit](https://github.com/BattletechModders/ModTek/commit/a1ee1cc6904fe7111716e4b10f5146a16d6208db): Backport of random sampling ideas from newer .NET versions
+- [Commit](https://github.com/BattletechModders/ModTek/commit/b86c619ddde369e6240797ccdd3bf2a99cb88958): Batch writes to OS Buffers for improved performance.
 
 ## Optimization - In Mission:
 
@@ -37,6 +50,7 @@ Identification:
 - Manual instrumentation through CleverGirl (profiler initially unavailable)
 - Enabling LowVis trace increased logging times to > ~`2 sec` per turn.
 - `String.Concat`, `DateTime.ToString`, `StreamWriter.WriteLine()`, `StreamWriter.Flush()` found to contribute to main thread execution times
+- Kicked off performance optimizations using .NET ConcurrentQueue, which was quickly replaced with circular buffer and started remaining optimization efforts ~ 2024 NOV to DEC.
 
 Fix:
 - [PR](https://github.com/BattletechModders/IRBTModUtils/pull/16)
@@ -132,3 +146,6 @@ Identification:
 Fix:
 - Implement automated inlining through backported heuristics at injection time. 
 - To avoid unpatching HarmonyX, conflict detection must be ran prior to inserting inlines
+
+
+
