@@ -63,7 +63,8 @@ Notes:
 ## Optimization - Startup:
 ### Asynchronous Logging - `ModTek.Features.Logging.MTLoggerAsyncQueue`
 Identification:
-- ModTek already realized needs to provide async formatting, however stayed synchronous for critical messages.
+- ModTek asynchronous processing was improved with better optimized code
+- Faster dispatching and moving formatting off-main reduced was required
 - Increased logging warranted ModTek to also be asynchronous for performance concerns and future redirect of logging from IRBTModUtils to ModTek.
 
 Fix:
