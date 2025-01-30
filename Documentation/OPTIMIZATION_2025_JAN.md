@@ -19,14 +19,16 @@ This document highlights AI optimization efforts, starting with initial profilin
 - Found `*_PositionalFactor` evaluations took > `1 sec` when units had large movement ranges, more ammo modes, or multi-shot weaponry.
 - Manual profiling of log functions showed > ~`1 sec` per turn accumulated
 - Past profiling data and flame-graphs were reviewed
-- Profiler access enabled DotTrace visualization/flamegraphs
+- .NET Standard 2.0 was considered for GPU AI optimizations and python scripting for development.
+- GPU attempts halted when data acquisition began spiking manual instrumentation. 
+- Profiler access enabled DotTrace visualization/flamegraphs.
 
 ## Common Notes
-- .NET string processing and formatting frequently allocates new strings, take up time & memory, and increases Garbage Collector runtimes through underlying `mallocs` and `callocs`.
+- .NET Framework 4.7.x string processing and formatting frequently allocates new strings, take up time & memory, and increases Garbage Collector runtimes through underlying `mallocs` and `callocs`.
 - Allocating memory done frequently with strings where integers, bools, or enums can be used.
 - General memoization needed where performance concerns arise, often due to string comparisons over lists/loops.
 - Encoding is expensive, and Mono has UTF8 encoding overhead and string allocations for Reflection calls and naively implemented Managed <-> Native marshalling.
-- Due to extensive logging, formatting, buffer writing, encoding, and flush overhead can back up main. Performance worse on HDD and older SATA/M.2 SSD.
+- Due to extensive logging - formatting, buffer writing, encoding, and flush overhead can block main. Performance worse on HDD and older SATA/M.2 SSD.
 - Mono `InternalCall` overhead can range from 5 to 16ns, and more when marshalling data.
 - Call stack overhead is non-negligible, inclusive `InternalCall` overhead. This may remove performance benefits when JIT is faster than native implementation.
 
@@ -42,11 +44,12 @@ Notes:
 Process:
 - Adding `Auto-generate binding redirects` to `.csproj` properties enables .NET Standard 2.0 dependencies to be resolved against .NET Framework 4.7.2.
 - The `netstandard.dll` provided in the built version of Mono bundled with Unity Editor shall be referenced. If a different version of Mono BGE (Bleeding Edge) is used, use the `netstandard.dll` compiled alongside the Mono version.
-- Ensure all facade `.dlls` are referenced as needed when using libraries dependent on core features. These are also provided alongside editor releases, and can be compiled if recompiling Mono.
+- Ensure all facade `.dlls` are referenced as needed when using libraries dependent on core features. These are also provided alongside editor releases, and can be compiled alongside new Unity Mono versions.
 
 ### ModTek .NET Standard 2.0 Injector Support
 Notes:
-- To solve a circular dependency, injectors were converted to support MSBuild of injector `.dlls` and run them at build time to support referencing injected variables without running the game.
+- To solve a circular dependency, injectors were converted to support MSBuild of injector `.dlls` and run them at build time.
+- This supports referencing injected variables without running the game and requiring ModTek's preloader.
 
 ### BasketWeaver
 Notes:
@@ -174,10 +177,13 @@ Fix:
 - Implement automated inlining through backported heuristics at injection time. 
 - To avoid unpatching HarmonyX, conflict detection must be ran prior to inserting inlines
 
+## Optimization - SimGame:
 
 
-### References
-- [Current Mono Version](https://github.com/Unity-Technologies/mono/tree/unity-2018.4-mbe): Provides insight into runtime specifics, recompiled and ran for exploration and understanding
+## References
+- [ModTek Development Guide](https://github.com/BattletechModders/ModTek/blob/master/doc/DEVELOPMENT_GUIDE.md): Profiling information used to connect [dotTrace](https://www.jetbrains.com/profiler/). Main profiler used during optimization efforts after initial manual attempts.
+- [Current Mono Version](https://github.com/Unity-Technologies/mono/tree/unity-2018.4-mbe): Provides insight into runtime specifics. recompiled and ran for exploration and understanding
 - [.NET9 Performance Improvements](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-9/): Previous performance improvements included in links, and some techniques were backported or adapted as needed
-- [Unity Editor Archive](https://unity.com/releases/editor/archive): Used for `.dll` experimentation to integrated `.netstandard20` and understanding shaders for rendering and AI concerns
--[]
+- [Unity Editor Archive](https://unity.com/releases/editor/archive): Used for `.dll` experimentation against .NET Standard 2.0. Bundled shader `.cginc` files were used for L2 Spherical Harmonics optimization
+- [Stupid Spherical Harmonics](https://www.gdcvault.com/play/273/Stupid-Spherical-Harmonics-(SH)): Implementation/inspiration for spherical harmonics math as referencing in light probe documentation for Unity. Used to reimplement mathematics without function call overhead
+- [Frame Rate Booster](https://github.com/tool-buddy/FrameRateBooster): Prior discovery of constructor and LHS reuse optimizations for mathematics found in current profiling efforts.
