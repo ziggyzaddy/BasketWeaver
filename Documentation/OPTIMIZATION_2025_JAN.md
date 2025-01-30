@@ -63,8 +63,9 @@ Notes:
 ## Optimization - Startup:
 ### Asynchronous Logging - `ModTek.Features.Logging.MTLoggerAsyncQueue`
 Identification:
-- ModTek asynchronous processing was improved with better optimized code
-- Faster dispatching and moving formatting off-main reduced was required
+- ModTek asynchronous processing was improved with better optimized code.
+- Faster dispatching and moving formatting off-main reduces impact on single-threaded Unity game thread.
+- Some fixes addressed regressions from previous performance optimization efforts.
 - Increased logging warranted ModTek to also be asynchronous for performance concerns and future redirect of logging from IRBTModUtils to ModTek.
 
 Fix:
@@ -120,7 +121,7 @@ Identification:
 
 Fix:
 - Use `Krafs.Publicizer` to directly access the field and eliminate reflection overhead due to Mono.
-- Similar optimizations for to `CustomTranslation.Interpolator_Interpolate` and other instances using Reflection/Traverse
+- Similar optimizations in `CustomTranslation.Interpolator_Interpolate` and other instances using Reflection/Traverse
 
 
 ### Placeholder Interpolation - `MechEngineer.InterpolateText`
